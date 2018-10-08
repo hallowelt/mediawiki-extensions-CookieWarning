@@ -1,13 +1,60 @@
 <?php
-if ( function_exists( 'wfLoadExtension' ) ) {
-	wfLoadExtension( 'CookieWarning' );
-	// Keep i18n globals so mergeMessageFileList.php doesn't break
-	$wgMessagesDirs['CookieWarning'] = __DIR__ . '/i18n';
-	/* wfWarn(
-		'Deprecated PHP entry point used for CookieWarning extension. Please use wfLoadExtension' .
-		'instead, see https://www.mediawiki.org/wiki/Extension_registration for more details.'
-	); */
-	return true;
-} else {
-	die( 'This version of the CookieWarning extension requires MediaWiki 1.25+' );
-}
+
+$wgExtensionCredits['other'] = array(
+	"name" => "CookieWarning",
+	"version" => "0.1.0",
+	"author" => array(
+		"Florian Schmidt"
+	),
+	"url" => "https://www.droidwiki.de",
+	"descriptionmsg" => "cookiewarning-desc",
+	"type" => "other",
+	"license-name" => "MIT",
+);
+
+$wgMessagesDirs['CookieWarning'] = __DIR__ . '/i18n';
+
+$wgHooks["SkinTemplateOutputPageBeforeExec"][] = "CookieWarningHooks::onSkinTemplateOutputPageBeforeExec";
+$wgHooks["BeforePageDisplay"][] = "CookieWarningHooks::onBeforePageDisplay";
+$wgHooks["GetPreferences"][] = "CookieWarningHooks::onGetPreferences";
+$wgHooks["BeforeInitialize"][] = "CookieWarningHooks::onBeforeInitialize";
+
+$wgCookieWarningEnabled = false;
+$wgCookieWarningMoreUrl = "";
+
+$wgDefaultUserOptions['cookiewarning_dismissed'] = false;
+
+$resourceModuleTemplate = array(
+	'localBasePath' => $IP.'/extensions/CookieWarning/resources',
+	'remoteExtPath' => 'CookieWarning/resources',
+);
+
+$wgResourceModules['ext.CookieWarning'] = array(
+	'scripts' => array(
+		'ext.CookieWarning/ext.CookieWarning.js'
+	),
+	"dependencies" => array(
+		"mediawiki.api",
+		"jquery.cookie"
+	),
+	"targets" => array(
+		"mobile",
+		"desktop"
+	),
+) + $resourceModuleTemplate;
+
+$wgResourceModules["ext.CookieWarning.styles"] = array(
+	"position" => "top",
+	'styles' => array(
+		'ext.CookieWarning/ext.CookieWarning.css'
+	),
+	"targets" => array(
+		"mobile",
+		"desktop"
+	),
+) + $resourceModuleTemplate;
+
+$wgAutoloadClasses['CookieWarningHooks'] = __DIR__ . '/includes/CookieWarning.hooks.php';
+
+unset( $resourceModuleTemplate );
+

@@ -75,8 +75,10 @@ class CookieWarningHooks {
 			) .
 			$moreLink .
 			Html::openElement( 'form', [ 'method' => 'POST' ] ) .
-			Html::submitButton(
+			Html::input(
 				$sk->msg( 'cookiewarning-ok-label' )->text(),
+				$sk->msg( 'cookiewarning-ok-label' )->text(),
+				'submit',
 				[
 					'name' => 'disablecookiewarning',
 					'class' => 'mw-cookiewarning-dismiss'
@@ -97,10 +99,8 @@ class CookieWarningHooks {
 	 * @return string|null The url or null if none set
 	 */
 	private static function getMoreLink() {
-		// Config instance of CookieWarning
-		$conf = ConfigFactory::getDefaultInstance()->makeConfig( 'cookiewarning' );
-		if ( $conf->get( 'CookieWarningMoreUrl' ) ) {
-			return $conf->get( 'CookieWarningMoreUrl' );
+		if ( $GLOBALS['wgCookieWarningMoreUrl'] ) {
+			return $GLOBALS['wgCookieWarningMoreUrl'];
 		}
 		$cookieWarningMessage = wfMessage( 'cookiewarning-more-link' );
 		if ( $cookieWarningMessage->exists() && !$cookieWarningMessage->isDisabled() ) {
@@ -136,10 +136,9 @@ class CookieWarningHooks {
 	 */
 	private static function showWarning( IContextSource $context ) {
 		$user = $context->getUser();
-		$conf = ConfigFactory::getDefaultInstance()->makeConfig( 'cookiewarning' );
 		if (
 			// if enabled in LocalSettings.php
-			$conf->get( 'CookieWarningEnabled' ) &&
+			$GLOBALS['wgCookieWarningEnabled'] &&
 			// if not already dismissed by this user (and saved in the user prefs)
 			!$user->getBoolOption( 'cookiewarning_dismissed', false ) &&
 			// if not already dismissed by this user (and saved in the browser cookies)
@@ -160,6 +159,7 @@ class CookieWarningHooks {
 	 * @return bool
 	 */
 	public static function onGetPreferences( User $user, &$defaultPreferences ) {
+		error_log('inHOOK!');
 		$defaultPreferences['cookiewarning_dismissed'] = [
 			'type' => 'api',
 			'default' => '0',

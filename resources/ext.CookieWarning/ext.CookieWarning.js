@@ -1,11 +1,15 @@
-( function ( mw, $ ) {
+( function ( mw, $, d ) {
+
+	$( d ).ready( function() {
+		$('.mw-cookiewarning-container').toggle( 800 );
+	});
 	/**
 	 * Sets the cookie, that the cookiewarning is dismissed. Called,
 	 * when the api query to save this information in the user preferences,
 	 * failed for any reason.
 	 */
 	function setCookie() {
-		mw.cookie.set( 'cookiewarning_dismissed', true );
+		$.cookie( wgCookiePrefix + 'cookiewarning_dismissed', 1 );
 	}
 
 	// Click handler for the "Ok" element in the cookiewarning information bar
@@ -13,15 +17,22 @@
 		// an anonymous user doesn't have preferences, so don't try to save this in
 		// the user preferences.
 		if ( !mw.user.isAnon() ) {
-			// try to save, that the cookiewarning was disabled, in the user preferences
-			new mw.Api().postWithToken( 'options', {
-				action: 'options',
-				change: 'cookiewarning_dismissed=1'
-			} ).fail( function ( code, result ) {
-				// if it fails, fall back to the cookie
-				mw.log.warn( 'Failed to save dismissed CookieWarning: ' + code + '\n' + result.error + '. Using cookie now.' );
-				setCookie();
-			} );
+			$.ajax({
+				dataType: "json",
+				type: 'post',
+				url: mw.util.wikiScript( 'api' ),
+				data: {
+					action: 'options',
+					format: 'json',
+					change: 'cookiewarning_dismissed=1',
+					token: mw.user.tokens.get( 'editToken', '' )
+				},
+				success: function( oData, oTextStatus ) {
+					console.log(oData);
+					mw.log.warn( 'Failed to save dismissed CookieWarning' );
+					setCookie();
+				}
+			});
 		} else {
 			// use cookies for anonymous users
 			setCookie();
@@ -31,4 +42,4 @@
 
 		ev.preventDefault();
 	} );
-} )( mediaWiki, jQuery );
+} )( mediaWiki, jQuery, document );
