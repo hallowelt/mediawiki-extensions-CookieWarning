@@ -1,6 +1,6 @@
 <?php
 
-$wgExtensionCredits['other'] = array(
+$wgExtensionCredits['other'][] = array(
 	"name" => "CookieWarning",
 	"version" => "0.1.0",
 	"author" => array(
