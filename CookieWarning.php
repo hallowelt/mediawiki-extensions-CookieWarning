@@ -20,7 +20,7 @@ $wgHooks["GetPreferences"][] = "CookieWarningHooks::onGetPreferences";
 $wgHooks["BeforeInitialize"][] = "CookieWarningHooks::onBeforeInitialize";
 
 $wgCookieWarningEnabled = false;
-$wgCookieWarningMoreUrl = "";
+$wgCookieWarningMoreUrl = "Test";
 
 $wgDefaultUserOptions['cookiewarning_dismissed'] = false;
 
